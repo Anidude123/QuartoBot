@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quarto Customizable Bot</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="dark">
+  <header class="topbar">
+    <div>
+      <h1>Quarto Analyzer</h1>
+      <p>Clickable Quarto analyzer with editable piece inventory, custom physical sets, Monte Carlo, tactics, and minimax-lite.</p>
+    </div>
+    <div class="top-actions">
+      <button id="themeBtn">Light mode</button>
+      <button id="resetBtn">New game</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel board-panel">
+      <div class="status-row">
+        <div>
+          <strong id="phaseLabel">Choose first piece</strong>
+          <div id="statusText" class="muted">Select a remaining piece to give to the first placer.</div>
+        </div>
+        <div class="turn-badge" id="turnBadge">P0 chooses</div>
+      </div>
+
+      <div class="board-shell">
+        <div id="board" class="board" aria-label="Quarto board"></div>
+      </div>
+
+      <div class="current-piece-card">
+        <span>Current piece to place:</span>
+        <strong id="currentPieceLabel">None</strong>
+      </div>
+
+      <div class="bot-card">
+        <label class="check-row">
+          <input id="botEnabled" type="checkbox" />
+          <span>Play against bot</span>
+        </label>
+        <label>Bot plays
+          <select id="botSide">
+            <option value="1" selected>Player 1</option>
+            <option value="0">Player 0</option>
+          </select>
+        </label>
+        <label>Difficulty
+          <select id="botDifficulty">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+            <option value="expert">Expert</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="controls-grid">
+        <button id="suggestBtn">Suggest move</button>
+        <button id="applyBestBtn" disabled>Apply best suggestion</button>
+        <button id="undoBtn">Undo</button>
+        <button id="redoBtn">Redo</button>
+      </div>
+      <label class="check-row board-view-toggle">
+        <input id="diagonalBoard" type="checkbox" />
+        <span>Diagonal board</span>
+      </label>
+    </section>
+
+    <section class="panel pieces-panel">
+      <h2>Remaining pieces</h2>
+      <p class="muted small">Click a piece when the game is waiting for a piece to give. Duplicate codes are shown with #slot numbers, because apparently your set has lore.</p>
+      <div id="pieces" class="pieces"></div>
+    </section>
+
+    <section class="panel analysis-panel">
+      <h2>Analysis</h2>
+      <div class="settings">
+        <label>Engine
+          <select id="engineSelect">
+            <option value="hybrid" selected>Hybrid</option>
+            <option value="mcts">Monte Carlo</option>
+            <option value="minimax">Minimax-lite</option>
+            <option value="greedy">Tactical</option>
+            <option value="random">Random</option>
+          </select>
+        </label>
+        <label>Simulations
+          <select id="simSelect">
+            <option>100</option>
+            <option selected>500</option>
+            <option>1000</option>
+            <option>5000</option>
+            <option>10000</option>
+          </select>
+        </label>
+        <label>Depth
+          <select id="depthSelect">
+            <option>2</option>
+            <option selected>4</option>
+            <option>6</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="eval-card">
+        <div class="evalbar"><div id="evalFill"></div></div>
+        <div id="evalText">No analysis yet.</div>
+      </div>
+
+      <h3>Top recommendations</h3>
+      <div id="recommendations" class="recommendations muted">Click Suggest move.</div>
+
+      <h3>Threats</h3>
+      <div id="threats" class="threats muted">No threats yet.</div>
+    </section>
+
+
+    <section class="panel custom-panel">
+      <h2>Customize piece set</h2>
+      <p class="muted small">Enter exactly 16 piece codes. Duplicates are allowed. Missing official pieces are allowed. Codes use position 1 T/S = Tall/Short, position 2 L/D = Light/Dark, position 3 R/Q = Round/Square, position 4 F/H = Solid/Hole.</p>
+      <div class="preset-row">
+        <button id="officialPresetBtn">Official set</button>
+        <button id="defectivePresetBtn">No SDQH, two TDQH</button>
+        <button id="saveSetBtn">Save set</button>
+      </div>
+      <textarea id="inventoryBox" spellcheck="false"></textarea>
+      <div id="inventoryStatus" class="muted small">Current inventory loaded.</div>
+    </section>
+
+    <section class="panel notation-panel">
+      <h2>Notation / Import</h2>
+      <p class="muted small">Use lines like <code>give TLRF</code> then <code>place B2 give SDRH</code>.</p>
+      <textarea id="notationBox" spellcheck="false" placeholder="give TLRF&#10;place B2 give SDRH"></textarea>
+      <div class="controls-grid">
+        <button id="loadNotationBtn">Load notation</button>
+        <button id="exportBtn">Export</button>
+        <button id="copyBtn">Copy</button>
+        <button id="sampleBtn">Sample</button>
+      </div>
+      <h3>Move history</h3>
+      <ol id="history" class="history"></ol>
+    </section>
+  </main>
+
+  <footer>
+    Piece code: position 1 T/S = Tall/Short, position 2 L/D = Light/Dark, position 3 R/Q = Round/Square, position 4 F/H = Solid/Hole. Duplicate physical pieces are supported with #slot labels. Squares: A1-D4.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
