@@ -4,8 +4,7 @@
   --text: #1f2528;
   --muted: #65707a;
   --border: #111111;
-  --slot-bg: #ffffff;
-  --slot-border: #111111;
+  --bg-ring: #111111;
   --accent: #7b4f2f;
   --accent2: #c99356;
   --danger: #a43d3d;
@@ -18,8 +17,7 @@ body.dark {
   --text: #edf0f2;
   --muted: #a1aab3;
   --border: #6b4a2f;
-  --slot-bg: #000000;
-  --slot-border: #7b4f2f;
+  --bg-ring: #7b4f2f;
   --accent: #d79b62;
   --accent2: #8fb7ff;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
@@ -29,6 +27,8 @@ body {
   margin: 0;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
   background: var(--bg);
+  background-image: radial-gradient(circle, var(--bg) 0 18px, var(--bg-ring) 19px 21px, transparent 22px);
+  background-size: 72px 72px;
   color: var(--text);
 }
 .topbar {
@@ -108,9 +108,9 @@ p { margin: 0; }
 }
 .cell {
   aspect-ratio: 1 / 1;
-  border: 2px solid var(--slot-border);
-  border-radius: 50%;
-  background: var(--slot-bg);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  background: rgba(127,127,127,0.06);
   display: grid;
   place-items: center;
   cursor: pointer;
