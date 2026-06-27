@@ -66,30 +66,6 @@
       <div id="pieces" class="pieces"></div>
     </section>
 
-    <section class="panel bot-panel">
-      <h2>Bot</h2>
-      <div class="bot-options">
-        <label class="check-row">
-          <input id="botEnabled" type="checkbox" />
-          <span>Play against bot</span>
-        </label>
-        <label>Bot plays
-          <select id="botSide">
-            <option value="1" selected>Player 1</option>
-            <option value="0">Player 0</option>
-          </select>
-        </label>
-        <label>Difficulty
-          <select id="botDifficulty">
-            <option value="easy">Easy</option>
-            <option value="normal" selected>Normal</option>
-            <option value="hard">Hard</option>
-            <option value="expert">Expert</option>
-          </select>
-        </label>
-      </div>
-    </section>
-
     <section class="panel analysis-panel">
       <button id="analysisToggle" class="panel-toggle" type="button" aria-expanded="false" aria-controls="analysisContent">
         <span>Analysis</span>
@@ -134,6 +110,30 @@
 
         <h3>Threats</h3>
         <div id="threats" class="threats muted">No threats yet.</div>
+      </div>
+    </section>
+
+    <section class="panel bot-panel">
+      <h2>Bot</h2>
+      <div class="bot-options">
+        <label class="check-row">
+          <input id="botEnabled" type="checkbox" />
+          <span>Play against bot</span>
+        </label>
+        <label>Bot plays
+          <select id="botSide">
+            <option value="1" selected>Player 1</option>
+            <option value="0">Player 0</option>
+          </select>
+        </label>
+        <label>Difficulty
+          <select id="botDifficulty">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+            <option value="expert">Expert</option>
+          </select>
+        </label>
       </div>
     </section>
 

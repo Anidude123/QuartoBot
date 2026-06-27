@@ -56,8 +56,8 @@ p { margin: 0; }
 }
 .board-panel { grid-row: span 2; }
 .pieces-panel { grid-column: 2; grid-row: 1; }
-.bot-panel { grid-column: 3; grid-row: 1; }
-.analysis-panel { grid-column: 3; grid-row: 2; }
+.analysis-panel { grid-column: 3; grid-row: 1; }
+.bot-panel { grid-column: 3; grid-row: 2; margin-top: -8px; }
 .notation-panel { grid-column: span 2; }
 .status-row, .top-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .turn-badge {
