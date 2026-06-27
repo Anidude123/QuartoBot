@@ -212,6 +212,18 @@
   function setAnalysisOpen(open) {
     els.analysisPanel.hidden = false;
   }
+  function setAnalysisProgress(percent) {
+    els.evalFill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+  }
+  function startAnalysisProgress() {
+    els.evalFill.parentElement.classList.add('loading');
+    setAnalysisProgress(12);
+    els.evalText.textContent = 'Analysis progress: starting...';
+  }
+  function finishAnalysisProgress() {
+    els.evalFill.parentElement.classList.remove('loading');
+    setAnalysisProgress(100);
+  }
   function clearSuggestionHighlights() {
     els.board.querySelectorAll('.suggested').forEach(el => el.classList.remove('suggested'));
     els.pieces.querySelectorAll('.suggested').forEach(el => el.classList.remove('suggested'));
@@ -488,16 +500,17 @@
     setAnalysisOpen(true);
     els.suggestBtn.disabled = true;
     els.suggestBtn.textContent = 'Analyzing...';
+    startAnalysisProgress();
     els.recommendations.textContent = 'Analyzing without melting the browser...';
     setTimeout(() => {
     try {
+    setAnalysisProgress(48);
     if (state.currentPiece === null) {
       const recs = analyzeStartPieces();
       if (!recs.length) { els.recommendations.textContent = 'No piece recommendation available.'; return; }
       const best = recs[0];
       selectedSuggestion = {type:'start', piece:best.piece};
       els.applyBestBtn.disabled = false;
-      els.evalFill.style.width = '55%';
       els.evalText.textContent = `Best first piece: give ${codeOf(best.piece)} | eval ${Math.round(best.score)}`;
       els.recommendations.innerHTML = '';
       recs.forEach((r, idx) => {
@@ -514,7 +527,6 @@
       const best = recs[0];
       selectedSuggestion = {type:'give', piece:best.move.give, square:pendingSquare};
       els.applyBestBtn.disabled = best.move.give === null;
-      els.evalFill.style.width = '65%';
       els.evalText.textContent = best.move.give === null ? `Best: ${indexToSquare(pendingSquare)} ends the game.` : `Best: give ${codeOf(best.move.give)} after ${indexToSquare(pendingSquare)} | eval ${Math.round(best.score)}`;
       els.recommendations.innerHTML = '';
       recs.forEach((r, idx) => {
@@ -531,7 +543,6 @@
     const best = recs[0];
     const total = best.wins + best.draws + best.losses;
     const pct = total ? Math.round(((best.wins + 0.5*best.draws)/total)*100) : Math.max(0, Math.min(100, Math.round(50 + best.score/40000)));
-    els.evalFill.style.width = `${pct}%`;
     els.evalText.textContent = `Best: place ${indexToSquare(best.move.square)}${best.move.give===null?' and win/end game':`, give ${codeOf(best.move.give)}`} | eval ${Math.round(best.score)} | confidence ${pct}%`;
     els.recommendations.innerHTML = '';
     recs.forEach((r, idx) => {
@@ -546,6 +557,7 @@
     } catch (e) {
       els.recommendations.textContent = 'Analysis failed: ' + e.message;
     } finally {
+      finishAnalysisProgress();
       els.suggestBtn.disabled = false;
       els.suggestBtn.textContent = 'Suggest move';
     }
@@ -634,7 +646,7 @@
     else applyMove(m.square, m.give, `place ${indexToSquare(m.square)} give ${codeOf(m.give)}`);
   };
   els.undoBtn.onclick = undo; els.redoBtn.onclick = redo;
-  els.resetBtn.onclick = () => { state = newState(); pendingSquare = null; els.notationBox.value=''; els.recommendations.textContent='Click Suggest move.'; els.evalText.textContent='No analysis yet.'; els.evalFill.style.width='50%'; hideAnalysis(); render(); };
+  els.resetBtn.onclick = () => { state = newState(); pendingSquare = null; els.notationBox.value=''; els.recommendations.textContent='Click Suggest move.'; els.evalText.textContent='No analysis yet.'; els.evalFill.parentElement.classList.remove('loading'); setAnalysisProgress(0); hideAnalysis(); render(); };
   els.loadNotationBtn.onclick = loadNotation; els.exportBtn.onclick = exportNotation; els.sampleBtn.onclick = sample;
   els.copyBtn.onclick = async () => { exportNotation(); try { await navigator.clipboard.writeText(els.notationBox.value); } catch(e) {} };
   els.themeBtn.onclick = () => { document.body.classList.toggle('dark'); els.themeBtn.textContent = document.body.classList.contains('dark') ? 'Light mode' : 'Dark mode'; };
