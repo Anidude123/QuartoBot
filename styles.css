@@ -330,6 +330,14 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   line-height: 1.45;
 }
 .rules-card li + li { margin-top: 5px; }
+.piece-code-reference {
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  margin-top: 12px;
+  padding-top: 10px;
+}
 .settings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
 label { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
 .eval-card { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 16px; }
@@ -359,16 +367,6 @@ textarea {
   margin-bottom: 10px;
 }
 .history { max-height: 220px; overflow: auto; padding-left: 22px; }
-footer {
-  color: var(--text);
-  padding: 12px clamp(16px, 4vw, 44px) 28px;
-  display: flex;
-  justify-content: center;
-}
-.footer-box {
-  width: fit-content;
-  max-width: min(1180px, 100%);
-}
 code { background: rgba(127,127,127,0.13); padding: 2px 5px; border-radius: 6px; }
 @media (max-width: 1100px) {
   .layout { grid-template-columns: 1fr; }
