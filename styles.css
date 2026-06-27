@@ -112,9 +112,9 @@ p { margin: 0; }
   min-width: 86px;
   padding: 8px 10px;
 }
-.top-check {
-  min-width: 112px;
-  color: var(--text);
+.bot-top-group select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 .turn-badge {
   padding: 8px 12px;

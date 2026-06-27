@@ -27,10 +27,11 @@ Squares:
 A1-D4
 
 Recommended use:
-1. Enable Play against bot, then choose which player the bot controls.
-2. Pick a difficulty.
-3. Start with a piece if you are Player 1, or let the bot choose if it is Player 1.
-4. Place your piece, then choose the next piece for the bot.
+1. Use 2 player next to you for board-only pass-and-play.
+2. Switch to Play bot if you want the browser to control one player.
+3. Choose which player the bot controls and pick a difficulty.
+4. Start with a piece if you are Player 1, or let the bot choose if it is Player 1.
+5. Place your piece, then choose the next piece for the other player.
 
 Notes:
 This is a strong browser prototype, not a formally proven perfect Quarto solver. The hybrid engine combines immediate tactics, heuristic scoring, Monte Carlo rollouts, minimax-lite, and endgame search.

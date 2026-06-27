@@ -13,9 +13,11 @@
       <p>Clickable Quarto analyzer with editable piece inventory, custom physical sets, Monte Carlo, tactics, and minimax-lite.</p>
     </div>
     <div class="top-group bot-top-group">
-      <label class="check-row top-check">
-        <input id="botEnabled" type="checkbox" />
-        <span>Play bot</span>
+      <label>Mode
+        <select id="playMode">
+          <option value="local" selected>2 player next to you</option>
+          <option value="bot">Play bot</option>
+        </select>
       </label>
       <label>Bot
         <select id="botSide">

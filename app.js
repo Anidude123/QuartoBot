@@ -68,7 +68,7 @@
     undoBtn: document.getElementById('undoBtn'), redoBtn: document.getElementById('redoBtn'), resetBtn: document.getElementById('resetBtn'),
     engineSelect: document.getElementById('engineSelect'), simSelect: document.getElementById('simSelect'), depthSelect: document.getElementById('depthSelect'),
     analysisPanel: document.getElementById('analysisPanel'), analysisContent: document.getElementById('analysisContent'),
-    botEnabled: document.getElementById('botEnabled'), botSide: document.getElementById('botSide'), botDifficulty: document.getElementById('botDifficulty'),
+    playMode: document.getElementById('playMode'), botSide: document.getElementById('botSide'), botDifficulty: document.getElementById('botDifficulty'),
     diagonalBoard: document.getElementById('diagonalBoard'),
     evalFill: document.getElementById('evalFill'), evalText: document.getElementById('evalText'), recommendations: document.getElementById('recommendations'),
     threats: document.getElementById('threats'), notationBox: document.getElementById('notationBox'), loadNotationBtn: document.getElementById('loadNotationBtn'),
@@ -198,7 +198,12 @@
   let botThinking = false;
   let botTimer = null;
   function botPlayer() { return Number(els.botSide.value); }
-  function botEnabled() { return !!els.botEnabled.checked; }
+  function botEnabled() { return els.playMode.value === 'bot'; }
+  function syncBotControls() {
+    const enabled = botEnabled();
+    els.botSide.disabled = !enabled;
+    els.botDifficulty.disabled = !enabled;
+  }
   function activeActor(s=state) { return s.currentPiece === null ? s.chooser : s.placer; }
   function isBotTurn(s=state) {
     return botEnabled() && s.winner === null && activeActor(s) === botPlayer();
@@ -654,9 +659,10 @@
     els.inventoryStatus.textContent = inventorySummary() + ' Applied to the board.';
   };
   els.saveSetBtn.onclick = () => { try { applyInventory(parseInventoryText(els.inventoryBox.value), true); els.inventoryStatus.textContent = inventorySummary() + ' Saved in this browser.'; } catch(e) { alert(e.message); } };
-  els.botEnabled.onchange = () => { hideAnalysis(); pendingSquare = null; render(); };
+  els.playMode.onchange = () => { hideAnalysis(); pendingSquare = null; syncBotControls(); render(); };
   els.botSide.onchange = () => { hideAnalysis(); pendingSquare = null; render(); };
   els.botDifficulty.onchange = () => { hideAnalysis(); if (isBotTurn()) scheduleBotMove(); };
   els.diagonalBoard.onchange = () => { els.board.classList.toggle('diagonal', els.diagonalBoard.checked); };
+  syncBotControls();
   render();
 })();
