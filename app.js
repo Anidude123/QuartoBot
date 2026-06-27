@@ -217,8 +217,17 @@
   }
   function startAnalysisProgress() {
     els.evalFill.parentElement.classList.add('loading');
-    setAnalysisProgress(12);
+    setAnalysisProgress(8);
     els.evalText.textContent = 'Analysis progress: starting...';
+    setTimeout(() => {
+      if (els.evalFill.parentElement.classList.contains('loading')) setAnalysisProgress(32);
+    }, 80);
+    setTimeout(() => {
+      if (els.evalFill.parentElement.classList.contains('loading')) setAnalysisProgress(62);
+    }, 220);
+    setTimeout(() => {
+      if (els.evalFill.parentElement.classList.contains('loading')) setAnalysisProgress(86);
+    }, 420);
   }
   function finishAnalysisProgress() {
     els.evalFill.parentElement.classList.remove('loading');
@@ -504,7 +513,6 @@
     els.recommendations.textContent = 'Analyzing without melting the browser...';
     setTimeout(() => {
     try {
-    setAnalysisProgress(48);
     if (state.currentPiece === null) {
       const recs = analyzeStartPieces();
       if (!recs.length) { els.recommendations.textContent = 'No piece recommendation available.'; return; }
