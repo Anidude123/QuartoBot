@@ -195,21 +195,6 @@ p { margin: 0; }
   position: relative;
   overflow: hidden;
 }
-.piece::after {
-  content: attr(data-code);
-  display: block;
-  position: relative;
-  z-index: 1;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.45), 0 -1px 2px rgba(255,255,255,0.45);
-}
-.piece.hollow::after {
-  color: #fff8e8;
-  text-shadow:
-    -1px -1px 0 rgba(0,0,0,0.85),
-    1px -1px 0 rgba(0,0,0,0.85),
-    -1px 1px 0 rgba(0,0,0,0.85),
-    1px 1px 0 rgba(0,0,0,0.85);
-}
 .piece.dark-piece { background: #3c2c23; color: #fff1df; }
 .piece.short { transform: scale(0.78); }
 .piece.round { border-radius: 50%; }
