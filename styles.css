@@ -366,12 +366,7 @@ footer {
   justify-content: center;
 }
 .footer-box {
-  background: var(--panel);
-  border: 3px solid var(--border);
-  border-radius: 12px;
-  padding: 12px 14px;
-  box-shadow: var(--shadow);
-  display: inline-block;
+  width: fit-content;
   max-width: min(1180px, 100%);
 }
 code { background: rgba(127,127,127,0.13); padding: 2px 5px; border-radius: 6px; }
