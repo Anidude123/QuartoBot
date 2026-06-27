@@ -242,6 +242,16 @@ p { margin: 0; }
   background: rgba(47,122,79,0.18);
   box-shadow: 0 0 0 3px rgba(47,122,79,0.22);
 }
+.piece-ref {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 6px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
 .pieces {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(122px, 1fr));

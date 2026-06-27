@@ -175,7 +175,7 @@
       const chip = document.createElement('div'); chip.className = 'piece-chip';
       chip.dataset.piece = String(p);
       chip.appendChild(pieceNode(p, true));
-      const span = document.createElement('span'); span.textContent = `${codeOf(p)} #${p+1}`; chip.appendChild(span);
+      const span = document.createElement('span'); span.className = 'piece-ref'; span.textContent = `${codeOf(p)} #${p+1}`; chip.appendChild(span);
       chip.onclick = () => onPiece(p); els.pieces.appendChild(chip);
     }
     els.currentPieceLabel.textContent = state.currentPiece===null ? 'None' : describePiece(state.currentPiece);
