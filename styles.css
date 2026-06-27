@@ -176,8 +176,11 @@ p { margin: 0; }
 .board.diagonal .piece {
   transform: rotate(-45deg);
 }
+.board.diagonal .piece.tall {
+  transform: rotate(-45deg) scale(1.06);
+}
 .board.diagonal .piece.short {
-  transform: rotate(-45deg) scale(0.78);
+  transform: rotate(-45deg) scale(0.64);
 }
 .piece {
   width: 58px;
@@ -195,7 +198,8 @@ p { margin: 0; }
   overflow: hidden;
 }
 .piece.dark-piece { background: #765c4b; color: #fff1df; }
-.piece.short { transform: scale(0.78); }
+.piece.tall { transform: scale(1.06); }
+.piece.short { transform: scale(0.64); }
 .piece.round { border-radius: 50%; }
 .piece.square { border-radius: 12px; }
 .piece.hollow::before {
