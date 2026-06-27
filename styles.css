@@ -207,10 +207,11 @@ p { margin: 0; }
   width: 62%;
   height: 62%;
   border-radius: 50%;
-  background: var(--panel);
+  background: #c7ad87;
   transform: translate(-50%, -50%);
   z-index: 0;
 }
+.piece.dark-piece.hollow::before { background: #241812; }
 .piece-chip {
   border: 1px solid var(--border);
   border-radius: 14px;
