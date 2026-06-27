@@ -96,7 +96,7 @@ p { margin: 0; }
 .analysis-panel { grid-column: 3; grid-row: 1; }
 .custom-panel { grid-column: 2 / span 2; grid-row: 2; }
 .notation-panel { grid-column: 1 / span 2; grid-row: 3; align-self: stretch; }
-.game-description-panel { grid-column: 3; grid-row: 3; align-self: stretch; }
+.game-description-panel { grid-column: 3; grid-row: 3; align-self: start; }
 .status-row, .top-actions, .bot-top-group { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .top-actions {
   display: grid;
@@ -343,11 +343,6 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   font-size: 14px;
   line-height: 1.5;
 }
-.game-description-panel {
-  display: flex;
-  flex-direction: column;
-}
-.game-description-box { flex: 1; }
 .game-description-box p + p { margin-top: 10px; }
 .settings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
 label { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
