@@ -6,6 +6,8 @@
   --border: #c0c0c0;
   --bg-ring: #c0c0c0;
   --top-border: #d8d8d8;
+  --top-bg: #000000;
+  --top-text: #ffffff;
   --accent: #7b4f2f;
   --accent2: #c99356;
   --danger: #a43d3d;
@@ -20,6 +22,8 @@ body.dark {
   --border: #6b4a2f;
   --bg-ring: #7b4f2f;
   --top-border: #7b4f2f;
+  --top-bg: #ffffff;
+  --top-text: #000000;
   --accent: #d79b62;
   --accent2: #8fb7ff;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
@@ -49,10 +53,11 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .top-group {
-  background: transparent;
+  background: var(--top-bg);
   border: 1px solid var(--top-border);
   border-radius: 12px;
   padding: 12px;
+  color: var(--top-text);
 }
 .title-group {
   min-width: 240px;
@@ -92,7 +97,7 @@ p { margin: 0; }
 }
 .bot-top-group label {
   min-width: 92px;
-  color: var(--muted);
+  color: var(--top-text);
 }
 .bot-top-group select {
   min-width: 86px;
@@ -100,7 +105,7 @@ p { margin: 0; }
 }
 .top-check {
   min-width: 112px;
-  color: var(--text);
+  color: var(--top-text);
 }
 .turn-badge {
   padding: 8px 12px;
@@ -282,6 +287,7 @@ button, select {
 .topbar button,
 .topbar select {
   background: transparent;
+  color: var(--top-text);
 }
 button:hover { border-color: var(--accent); }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
