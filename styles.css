@@ -355,7 +355,7 @@ label { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
 }
 @keyframes progressStripes {
   from { background-position: 0 0; }
-  to { background-position: 28px 0; }
+  to { background-position: -28px 0; }
 }
 .recommendation {
   border: 1px solid var(--border);
