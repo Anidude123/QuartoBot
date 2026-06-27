@@ -410,3 +410,35 @@ code { background: rgba(127,127,127,0.13); padding: 2px 5px; border-radius: 6px;
 #inventoryBox { min-height: 230px; }
 #inventoryStatus { margin-top: 8px; }
 @media (max-width: 1100px) { .custom-panel { grid-column: span 1; } .preset-row { grid-template-columns: 1fr; } }
+@media (max-width: 760px) {
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 14px;
+  }
+  .top-group,
+  .title-group {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+  .title-group {
+    text-align: center;
+  }
+  .bot-top-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-content: stretch;
+  }
+  .bot-top-group label,
+  .bot-top-group select {
+    width: 100%;
+    min-width: 0;
+  }
+  .top-actions {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: 1fr;
+  }
+}
