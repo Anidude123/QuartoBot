@@ -63,6 +63,7 @@
     board: document.getElementById('board'), pieces: document.getElementById('pieces'),
     phaseLabel: document.getElementById('phaseLabel'), statusText: document.getElementById('statusText'),
     turnBadge: document.getElementById('turnBadge'), currentPieceLabel: document.getElementById('currentPieceLabel'),
+    currentPiecePreview: document.getElementById('currentPiecePreview'),
     suggestBtn: document.getElementById('suggestBtn'), applyBestBtn: document.getElementById('applyBestBtn'),
     undoBtn: document.getElementById('undoBtn'), redoBtn: document.getElementById('redoBtn'), resetBtn: document.getElementById('resetBtn'),
     engineSelect: document.getElementById('engineSelect'), simSelect: document.getElementById('simSelect'), depthSelect: document.getElementById('depthSelect'),
@@ -178,6 +179,8 @@
       chip.onclick = () => onPiece(p); els.pieces.appendChild(chip);
     }
     els.currentPieceLabel.textContent = state.currentPiece===null ? 'None' : describePiece(state.currentPiece);
+    els.currentPiecePreview.innerHTML = '';
+    if (state.currentPiece !== null) els.currentPiecePreview.appendChild(pieceNode(state.currentPiece));
     if (state.winner === 'draw') { els.phaseLabel.textContent = 'Draw'; els.statusText.textContent = 'Board filled with no Quarto.'; els.turnBadge.textContent = 'Game over'; }
     else if (state.winner !== null) { els.phaseLabel.textContent = `Player ${state.winner} wins`; els.statusText.textContent = 'A shared attribute line was completed.'; els.turnBadge.textContent = 'Game over'; }
     else if (state.currentPiece === null) { els.phaseLabel.textContent = 'Choose first piece'; els.statusText.textContent = 'Click a remaining piece or type give XXXX.'; els.turnBadge.textContent = 'P0 chooses'; }

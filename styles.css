@@ -216,9 +216,20 @@ p { margin: 0; }
   padding: 12px;
   border-radius: 14px;
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 12px;
+}
+.current-piece-card > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+.current-piece-preview {
+  width: 70px;
+  min-height: 70px;
+  display: grid;
+  place-items: center;
 }
 .check-row {
   display: flex;
