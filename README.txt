@@ -27,7 +27,7 @@ Squares:
 A1-D4
 
 Recommended use:
-1. Use 2 player next to you for board-only pass-and-play.
+1. Use Local Two Player for board-only pass-and-play.
 2. Switch to Play bot if you want the browser to control one player.
 3. Choose which player the bot controls and pick a difficulty.
 4. Start with a piece if you are Player 1, or let the bot choose if it is Player 1.
