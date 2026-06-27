@@ -38,7 +38,7 @@ body {
   background-size:
     144px 144px,
     144px 144px;
-  animation: driftRings 36s linear infinite;
+  animation: driftRings 14s linear infinite;
   color: var(--text);
 }
 @keyframes driftRings {
