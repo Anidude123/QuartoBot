@@ -362,10 +362,12 @@ textarea {
 footer { color: var(--muted); padding: 12px clamp(16px, 4vw, 44px) 28px; }
 .footer-box {
   background: var(--panel);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: 12px;
   padding: 12px;
   box-shadow: var(--shadow);
+  max-width: 1180px;
+  margin: 0 auto;
 }
 code { background: rgba(127,127,127,0.13); padding: 2px 5px; border-radius: 6px; }
 @media (max-width: 1100px) {
