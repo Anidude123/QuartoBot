@@ -66,6 +66,7 @@
     suggestBtn: document.getElementById('suggestBtn'), applyBestBtn: document.getElementById('applyBestBtn'),
     undoBtn: document.getElementById('undoBtn'), redoBtn: document.getElementById('redoBtn'), resetBtn: document.getElementById('resetBtn'),
     engineSelect: document.getElementById('engineSelect'), simSelect: document.getElementById('simSelect'), depthSelect: document.getElementById('depthSelect'),
+    analysisToggle: document.getElementById('analysisToggle'), analysisContent: document.getElementById('analysisContent'),
     botEnabled: document.getElementById('botEnabled'), botSide: document.getElementById('botSide'), botDifficulty: document.getElementById('botDifficulty'),
     diagonalBoard: document.getElementById('diagonalBoard'),
     evalFill: document.getElementById('evalFill'), evalText: document.getElementById('evalText'), recommendations: document.getElementById('recommendations'),
@@ -194,6 +195,12 @@
     return botEnabled() && s.winner === null && activeActor(s) === botPlayer();
   }
   function humanTurnBlocked() { return botThinking || isBotTurn(); }
+  function setAnalysisOpen(open) {
+    els.analysisContent.hidden = !open;
+    els.analysisToggle.setAttribute('aria-expanded', String(open));
+    const icon = els.analysisToggle.querySelector('.toggle-icon');
+    if (icon) icon.textContent = open ? '-' : '+';
+  }
   function onCell(i) {
     if (humanTurnBlocked()) return;
     if (state.winner !== null || state.currentPiece === null || state.board[i] !== null) return;
@@ -415,6 +422,7 @@
     }, 30);
   }
   function showAnalysis() {
+    setAnalysisOpen(true);
     els.suggestBtn.disabled = true;
     els.suggestBtn.textContent = 'Analyzing...';
     els.recommendations.textContent = 'Analyzing without melting the browser...';
@@ -511,6 +519,7 @@
   }
 
 
+  els.analysisToggle.onclick = () => setAnalysisOpen(els.analysisContent.hidden);
   els.suggestBtn.onclick = showAnalysis;
   els.applyBestBtn.onclick = () => { if (selectedSuggestion) { const m = selectedSuggestion.move; if (m.give === null) applyMove(m.square, null, `place ${indexToSquare(m.square)}`); else applyMove(m.square, m.give, `place ${indexToSquare(m.square)} give ${codeOf(m.give)}`); } };
   els.undoBtn.onclick = undo; els.redoBtn.onclick = redo;
@@ -539,9 +548,9 @@
     els.inventoryStatus.textContent = inventorySummary() + ' Applied to the board.';
   };
   els.saveSetBtn.onclick = () => { try { applyInventory(parseInventoryText(els.inventoryBox.value), true); els.inventoryStatus.textContent = inventorySummary() + ' Saved in this browser.'; } catch(e) { alert(e.message); } };
-  els.botEnabled.onchange = () => { pendingSquare = null; render(); };
-  els.botSide.onchange = () => { pendingSquare = null; render(); };
-  els.botDifficulty.onchange = () => { if (isBotTurn()) scheduleBotMove(); };
+  els.botEnabled.onchange = () => { if (els.botEnabled.checked) setAnalysisOpen(false); pendingSquare = null; render(); };
+  els.botSide.onchange = () => { setAnalysisOpen(false); pendingSquare = null; render(); };
+  els.botDifficulty.onchange = () => { setAnalysisOpen(false); if (isBotTurn()) scheduleBotMove(); };
   els.diagonalBoard.onchange = () => { els.board.classList.toggle('diagonal', els.diagonalBoard.checked); };
   render();
 })();

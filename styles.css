@@ -55,6 +55,9 @@ p { margin: 0; }
   box-shadow: var(--shadow);
 }
 .board-panel { grid-row: span 2; }
+.pieces-panel { grid-column: 2; grid-row: 1; }
+.bot-panel { grid-column: 3; grid-row: 1; }
+.analysis-panel { grid-column: 3; grid-row: 2; }
 .notation-panel { grid-column: span 2; }
 .status-row, .top-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .turn-badge {
@@ -188,16 +191,10 @@ p { margin: 0; }
   gap: 8px;
   margin-bottom: 12px;
 }
-.bot-card {
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px;
+.bot-options {
   display: grid;
-  grid-template-columns: 1.1fr 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 10px;
-  align-items: end;
-  margin-bottom: 12px;
-  background: rgba(127,127,127,0.04);
 }
 .check-row {
   display: flex;
@@ -225,6 +222,32 @@ button:hover { border-color: var(--accent); }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
 .controls-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .board-view-toggle { margin-top: 10px; }
+.panel-toggle {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 24px;
+  text-align: left;
+}
+.panel-toggle:hover { color: var(--accent); }
+.toggle-icon {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  line-height: 1;
+}
+.analysis-content { margin-top: 14px; }
 .rules-card {
   border-top: 1px solid var(--border);
   margin-top: 16px;
@@ -271,8 +294,13 @@ footer { color: var(--muted); padding: 12px clamp(16px, 4vw, 44px) 28px; }
 code { background: rgba(127,127,127,0.13); padding: 2px 5px; border-radius: 6px; }
 @media (max-width: 1100px) {
   .layout { grid-template-columns: 1fr; }
+  .pieces-panel,
+  .bot-panel,
+  .analysis-panel {
+    grid-column: auto;
+    grid-row: auto;
+  }
   .notation-panel { grid-column: span 1; }
-  .bot-card { grid-template-columns: 1fr; }
 }
 .custom-panel { grid-column: span 2; }
 .preset-row { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:8px; margin:10px 0; }

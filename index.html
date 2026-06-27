@@ -37,27 +37,6 @@
         <strong id="currentPieceLabel">None</strong>
       </div>
 
-      <div class="bot-card">
-        <label class="check-row">
-          <input id="botEnabled" type="checkbox" />
-          <span>Play against bot</span>
-        </label>
-        <label>Bot plays
-          <select id="botSide">
-            <option value="1" selected>Player 1</option>
-            <option value="0">Player 0</option>
-          </select>
-        </label>
-        <label>Difficulty
-          <select id="botDifficulty">
-            <option value="easy">Easy</option>
-            <option value="normal" selected>Normal</option>
-            <option value="hard">Hard</option>
-            <option value="expert">Expert</option>
-          </select>
-        </label>
-      </div>
-
       <div class="controls-grid">
         <button id="suggestBtn">Suggest move</button>
         <button id="applyBestBtn" disabled>Apply best suggestion</button>
@@ -87,46 +66,75 @@
       <div id="pieces" class="pieces"></div>
     </section>
 
+    <section class="panel bot-panel">
+      <h2>Bot</h2>
+      <div class="bot-options">
+        <label class="check-row">
+          <input id="botEnabled" type="checkbox" />
+          <span>Play against bot</span>
+        </label>
+        <label>Bot plays
+          <select id="botSide">
+            <option value="1" selected>Player 1</option>
+            <option value="0">Player 0</option>
+          </select>
+        </label>
+        <label>Difficulty
+          <select id="botDifficulty">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+            <option value="expert">Expert</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
     <section class="panel analysis-panel">
-      <h2>Analysis</h2>
-      <div class="settings">
-        <label>Engine
-          <select id="engineSelect">
-            <option value="hybrid" selected>Hybrid</option>
-            <option value="mcts">Monte Carlo</option>
-            <option value="minimax">Minimax-lite</option>
-            <option value="greedy">Tactical</option>
-            <option value="random">Random</option>
-          </select>
-        </label>
-        <label>Simulations
-          <select id="simSelect">
-            <option>100</option>
-            <option selected>500</option>
-            <option>1000</option>
-            <option>5000</option>
-            <option>10000</option>
-          </select>
-        </label>
-        <label>Depth
-          <select id="depthSelect">
-            <option>2</option>
-            <option selected>4</option>
-            <option>6</option>
-          </select>
-        </label>
+      <button id="analysisToggle" class="panel-toggle" type="button" aria-expanded="false" aria-controls="analysisContent">
+        <span>Analysis</span>
+        <span class="toggle-icon" aria-hidden="true">+</span>
+      </button>
+      <div id="analysisContent" class="analysis-content" hidden>
+        <div class="settings">
+          <label>Engine
+            <select id="engineSelect">
+              <option value="hybrid" selected>Hybrid</option>
+              <option value="mcts">Monte Carlo</option>
+              <option value="minimax">Minimax-lite</option>
+              <option value="greedy">Tactical</option>
+              <option value="random">Random</option>
+            </select>
+          </label>
+          <label>Simulations
+            <select id="simSelect">
+              <option>100</option>
+              <option selected>500</option>
+              <option>1000</option>
+              <option>5000</option>
+              <option>10000</option>
+            </select>
+          </label>
+          <label>Depth
+            <select id="depthSelect">
+              <option>2</option>
+              <option selected>4</option>
+              <option>6</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="eval-card">
+          <div class="evalbar"><div id="evalFill"></div></div>
+          <div id="evalText">No analysis yet.</div>
+        </div>
+
+        <h3>Top recommendations</h3>
+        <div id="recommendations" class="recommendations muted">Click Suggest move.</div>
+
+        <h3>Threats</h3>
+        <div id="threats" class="threats muted">No threats yet.</div>
       </div>
-
-      <div class="eval-card">
-        <div class="evalbar"><div id="evalFill"></div></div>
-        <div id="evalText">No analysis yet.</div>
-      </div>
-
-      <h3>Top recommendations</h3>
-      <div id="recommendations" class="recommendations muted">Click Suggest move.</div>
-
-      <h3>Threats</h3>
-      <div id="threats" class="threats muted">No threats yet.</div>
     </section>
 
 
