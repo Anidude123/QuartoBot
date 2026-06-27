@@ -182,9 +182,9 @@
     els.currentPiecePreview.innerHTML = '';
     if (state.currentPiece !== null) els.currentPiecePreview.appendChild(pieceNode(state.currentPiece));
     if (state.winner === 'draw') { els.phaseLabel.textContent = 'Draw'; els.statusText.textContent = 'Board filled with no Quarto.'; els.turnBadge.textContent = 'Game over'; }
-    else if (state.winner !== null) { els.phaseLabel.textContent = `Player ${state.winner} wins`; els.statusText.textContent = 'A shared attribute line was completed.'; els.turnBadge.textContent = 'Game over'; }
-    else if (state.currentPiece === null) { els.phaseLabel.textContent = 'Choose first piece'; els.statusText.textContent = 'Click a remaining piece or type give XXXX.'; els.turnBadge.textContent = 'P0 chooses'; }
-    else { els.phaseLabel.textContent = `Player ${state.placer} places`; els.statusText.textContent = `Place ${codeOf(state.currentPiece)}, then choose a piece for Player ${state.chooser}.`; els.turnBadge.textContent = `P${state.placer} to place`; }
+    else if (state.winner !== null) { els.phaseLabel.textContent = `Player ${state.winner + 1} wins`; els.statusText.textContent = 'A shared attribute line was completed.'; els.turnBadge.textContent = 'Game over'; }
+    else if (state.currentPiece === null) { els.phaseLabel.textContent = 'Choose first piece'; els.statusText.textContent = 'Click a remaining piece or type give XXXX.'; els.turnBadge.textContent = 'P1 chooses'; }
+    else { els.phaseLabel.textContent = `Player ${state.placer + 1} places`; els.statusText.textContent = `Place ${codeOf(state.currentPiece)}, then choose a piece for Player ${state.chooser + 1}.`; els.turnBadge.textContent = `P${state.placer + 1} to place`; }
     if (isBotTurn() && !botThinking) {
       els.statusText.textContent = state.currentPiece === null ? 'Bot will choose the first piece.' : 'Bot will place this piece and choose one for you.';
       els.turnBadge.textContent += ' (bot)';

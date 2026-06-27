@@ -29,7 +29,7 @@ A1-D4
 Recommended use:
 1. Enable Play against bot, then choose which player the bot controls.
 2. Pick a difficulty.
-3. Start with a piece if you are Player 0, or let the bot choose if it is Player 0.
+3. Start with a piece if you are Player 1, or let the bot choose if it is Player 1.
 4. Place your piece, then choose the next piece for the bot.
 
 Notes:
