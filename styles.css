@@ -207,11 +207,11 @@ p { margin: 0; }
   width: 62%;
   height: 62%;
   border-radius: 50%;
-  background: #c7ad87;
+  background: radial-gradient(circle, #8f7652 0%, #aa906b 48%, #c7ad87 100%);
   transform: translate(-50%, -50%);
   z-index: 0;
 }
-.piece.dark-piece.hollow::before { background: #241812; }
+.piece.dark-piece.hollow::before { background: radial-gradient(circle, #120b08 0%, #1c110d 48%, #241812 100%); }
 .piece-chip {
   border: 1px solid var(--border);
   border-radius: 14px;
