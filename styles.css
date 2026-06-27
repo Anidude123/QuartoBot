@@ -60,7 +60,6 @@ body {
   justify-content: space-between;
   gap: 16px;
   padding: 22px clamp(16px, 4vw, 44px);
-  border-bottom: 1px solid var(--border);
 }
 .top-group {
   background: var(--panel);
