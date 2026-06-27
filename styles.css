@@ -195,7 +195,7 @@ p { margin: 0; }
   position: relative;
   overflow: hidden;
 }
-.piece.dark-piece { background: #5b4437; color: #fff1df; }
+.piece.dark-piece { background: #765c4b; color: #fff1df; }
 .piece.short { transform: scale(0.78); }
 .piece.round { border-radius: 50%; }
 .piece.square { border-radius: 12px; }
@@ -211,7 +211,7 @@ p { margin: 0; }
   transform: translate(-50%, -50%);
   z-index: 0;
 }
-.piece.dark-piece.hollow::before { background: radial-gradient(circle, #2f2119 0%, #443126 48%, #5b4437 100%); }
+.piece.dark-piece.hollow::before { background: radial-gradient(circle, #493528 0%, #5f4738 48%, #765c4b 100%); }
 .piece-chip {
   border: 1px solid var(--border);
   border-radius: 14px;
