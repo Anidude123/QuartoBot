@@ -66,7 +66,7 @@
     suggestBtn: document.getElementById('suggestBtn'), applyBestBtn: document.getElementById('applyBestBtn'),
     undoBtn: document.getElementById('undoBtn'), redoBtn: document.getElementById('redoBtn'), resetBtn: document.getElementById('resetBtn'),
     engineSelect: document.getElementById('engineSelect'), simSelect: document.getElementById('simSelect'), depthSelect: document.getElementById('depthSelect'),
-    analysisToggle: document.getElementById('analysisToggle'), analysisContent: document.getElementById('analysisContent'),
+    analysisPanel: document.getElementById('analysisPanel'), analysisContent: document.getElementById('analysisContent'),
     botEnabled: document.getElementById('botEnabled'), botSide: document.getElementById('botSide'), botDifficulty: document.getElementById('botDifficulty'),
     diagonalBoard: document.getElementById('diagonalBoard'),
     evalFill: document.getElementById('evalFill'), evalText: document.getElementById('evalText'), recommendations: document.getElementById('recommendations'),
@@ -129,12 +129,14 @@
     if (state.currentPiece !== null || state.history.length) throw new Error('Game already started. Reset or load notation from scratch.');
     if (!state.available.has(piece)) throw new Error('Piece unavailable.');
     pushUndo(record, `give ${codeOf(piece)}`);
-    state.currentPiece = piece; state.available.delete(piece); state.chooser = 0; state.placer = 1; render();
+    state.currentPiece = piece; state.available.delete(piece); state.chooser = 0; state.placer = 1; hideAnalysis(); render();
   }
   function applyMove(square, givePiece, label=null, record=true) {
     pushUndo(record, label || `place ${indexToSquare(square)} give ${codeOf(givePiece)}`);
     const next = afterPlaceAndGive(state, square, givePiece);
     Object.assign(state, next);
+    pendingSquare = null;
+    hideAnalysis();
     render();
   }
   function pushUndo(record, notation) {
@@ -157,16 +159,20 @@
   function render() {
     syncInventoryBox();
     selectedSuggestion = null; els.applyBestBtn.disabled = true;
+    els.suggestBtn.disabled = botEnabled();
+    els.suggestBtn.title = botEnabled() ? 'Turn off bot play to use analysis suggestions.' : '';
     els.board.innerHTML = '';
     for (let i=0;i<16;i++) {
       const c = document.createElement('button'); c.className = 'cell'; c.dataset.square = indexToSquare(i);
       if (state.winLine && state.winLine.includes(i)) c.classList.add('win');
+      if (pendingSquare === i) c.classList.add('pending');
       if (state.board[i] !== null) c.appendChild(pieceNode(state.board[i]));
       c.onclick = () => onCell(i); els.board.appendChild(c);
     }
     els.pieces.innerHTML = '';
     for (const p of legalPieces().sort((a,b)=>a-b)) {
       const chip = document.createElement('div'); chip.className = 'piece-chip';
+      chip.dataset.piece = String(p);
       chip.appendChild(pieceNode(p, true));
       const span = document.createElement('span'); span.textContent = `${codeOf(p)} #${p+1}`; chip.appendChild(span);
       chip.onclick = () => onPiece(p); els.pieces.appendChild(chip);
@@ -196,15 +202,36 @@
   }
   function humanTurnBlocked() { return botThinking || isBotTurn(); }
   function setAnalysisOpen(open) {
-    els.analysisContent.hidden = !open;
-    els.analysisToggle.setAttribute('aria-expanded', String(open));
-    const icon = els.analysisToggle.querySelector('.toggle-icon');
-    if (icon) icon.textContent = open ? '-' : '+';
+    els.analysisPanel.hidden = !open;
+  }
+  function clearSuggestionHighlights() {
+    els.board.querySelectorAll('.suggested').forEach(el => el.classList.remove('suggested'));
+    els.pieces.querySelectorAll('.suggested').forEach(el => el.classList.remove('suggested'));
+    els.recommendations.querySelectorAll('.top').forEach(el => el.classList.remove('top'));
+  }
+  function hideAnalysis() {
+    selectedSuggestion = null;
+    els.applyBestBtn.disabled = true;
+    clearSuggestionHighlights();
+    setAnalysisOpen(false);
+  }
+  function highlightSuggestion({square=null, piece=null}={}) {
+    clearSuggestionHighlights();
+    if (square !== null) {
+      const cell = els.board.querySelector(`[data-square="${indexToSquare(square)}"]`);
+      if (cell) cell.classList.add('suggested');
+    }
+    if (piece !== null) {
+      const chip = els.pieces.querySelector(`[data-piece="${piece}"]`);
+      if (chip) chip.classList.add('suggested');
+    }
   }
   function onCell(i) {
     if (humanTurnBlocked()) return;
     if (state.winner !== null || state.currentPiece === null || state.board[i] !== null) return;
     pendingSquare = i;
+    hideAnalysis();
+    render();
     els.statusText.textContent = `Selected ${indexToSquare(i)}. Now click a piece to give next.`;
   }
   function onPiece(p) {
@@ -367,6 +394,15 @@
     }).sort((a,b)=>b.score-a.score).slice(0,5);
     return recs;
   }
+  function analyzeGivePieces(square) {
+    if (state.currentPiece === null || state.winner !== null) return [];
+    const perspective = state.placer;
+    return candidateMoves(state)
+      .filter(m => m.square === square)
+      .map(move => ({move, score: tacticalScore(state, move, perspective)}))
+      .sort((a,b) => b.score - a.score)
+      .slice(0,5);
+  }
   function botStartPiece() {
     const pieces = legalPieces();
     if (els.botDifficulty.value === 'easy') return randomChoice(pieces);
@@ -422,15 +458,36 @@
     }, 30);
   }
   function showAnalysis() {
+    if (botEnabled()) {
+      hideAnalysis();
+      return;
+    }
     setAnalysisOpen(true);
     els.suggestBtn.disabled = true;
     els.suggestBtn.textContent = 'Analyzing...';
     els.recommendations.textContent = 'Analyzing without melting the browser...';
     setTimeout(() => {
     try {
+    if (pendingSquare !== null) {
+      const recs = analyzeGivePieces(pendingSquare);
+      if (!recs.length) { els.recommendations.textContent = 'No piece recommendation available.'; return; }
+      const best = recs[0];
+      selectedSuggestion = {type:'give', piece:best.move.give, square:pendingSquare};
+      els.applyBestBtn.disabled = best.move.give === null;
+      els.evalFill.style.width = '65%';
+      els.evalText.textContent = best.move.give === null ? `Best: ${indexToSquare(pendingSquare)} ends the game.` : `Best: give ${codeOf(best.move.give)} after ${indexToSquare(pendingSquare)} | eval ${Math.round(best.score)}`;
+      els.recommendations.innerHTML = '';
+      recs.forEach((r, idx) => {
+        const div = document.createElement('div'); div.className = `recommendation ${idx===0?'top':''}`;
+        div.innerHTML = `<strong>#${idx+1}</strong> Give <strong>${r.move.give===null?'none':codeOf(r.move.give)}</strong><br><span class="muted">after placing at ${indexToSquare(pendingSquare)} | score ${Math.round(r.score)}</span>`;
+        els.recommendations.appendChild(div);
+      });
+      highlightSuggestion({piece:best.move.give});
+      return;
+    }
     const recs = analyze();
     if (!recs.length) { els.recommendations.textContent = 'No legal analysis.'; return; }
-    selectedSuggestion = recs[0]; els.applyBestBtn.disabled = false;
+    selectedSuggestion = {type:'move', move:recs[0].move}; els.applyBestBtn.disabled = false;
     const best = recs[0];
     const total = best.wins + best.draws + best.losses;
     const pct = total ? Math.round(((best.wins + 0.5*best.draws)/total)*100) : Math.max(0, Math.min(100, Math.round(50 + best.score/40000)));
@@ -441,14 +498,15 @@
       const total = r.wins+r.draws+r.losses;
       const est = total ? ` W/D/L ${Math.round(r.wins/total*100)}%/${Math.round(r.draws/total*100)}%/${Math.round(r.losses/total*100)}%` : '';
       const ex = r.exact === 1 ? ' forced win' : r.exact === -1 ? ' forced loss' : r.exact === 0 ? ' forced draw' : '';
-      const div = document.createElement('div'); div.className = 'recommendation';
+      const div = document.createElement('div'); div.className = `recommendation ${idx===0?'top':''}`;
       div.innerHTML = `<strong>#${idx+1}</strong> Place <strong>${indexToSquare(r.move.square)}</strong>${r.move.give===null?'':` then give <strong>${codeOf(r.move.give)}</strong>`}<br><span class="muted">score ${Math.round(r.score)}${est}${ex}</span>`;
       els.recommendations.appendChild(div);
     });
+    highlightSuggestion({square:best.move.square});
     } catch (e) {
       els.recommendations.textContent = 'Analysis failed: ' + e.message;
     } finally {
-      els.suggestBtn.disabled = false;
+      els.suggestBtn.disabled = botEnabled();
       els.suggestBtn.textContent = 'Suggest move';
     }
     }, 20);
@@ -514,16 +572,25 @@
     state = newState();
     pendingSquare = null;
     selectedSuggestion = null;
+    hideAnalysis();
     inventoryBoxDirty = false;
     render();
   }
 
 
-  els.analysisToggle.onclick = () => setAnalysisOpen(els.analysisContent.hidden);
   els.suggestBtn.onclick = showAnalysis;
-  els.applyBestBtn.onclick = () => { if (selectedSuggestion) { const m = selectedSuggestion.move; if (m.give === null) applyMove(m.square, null, `place ${indexToSquare(m.square)}`); else applyMove(m.square, m.give, `place ${indexToSquare(m.square)} give ${codeOf(m.give)}`); } };
+  els.applyBestBtn.onclick = () => {
+    if (!selectedSuggestion) return;
+    if (selectedSuggestion.type === 'give') {
+      applyMove(selectedSuggestion.square, selectedSuggestion.piece, `place ${indexToSquare(selectedSuggestion.square)} give ${codeOf(selectedSuggestion.piece)}`);
+      return;
+    }
+    const m = selectedSuggestion.move;
+    if (m.give === null) applyMove(m.square, null, `place ${indexToSquare(m.square)}`);
+    else applyMove(m.square, m.give, `place ${indexToSquare(m.square)} give ${codeOf(m.give)}`);
+  };
   els.undoBtn.onclick = undo; els.redoBtn.onclick = redo;
-  els.resetBtn.onclick = () => { state = newState(); pendingSquare = null; els.notationBox.value=''; els.recommendations.textContent='Click Suggest move.'; els.evalText.textContent='No analysis yet.'; els.evalFill.style.width='50%'; render(); };
+  els.resetBtn.onclick = () => { state = newState(); pendingSquare = null; els.notationBox.value=''; els.recommendations.textContent='Click Suggest move.'; els.evalText.textContent='No analysis yet.'; els.evalFill.style.width='50%'; hideAnalysis(); render(); };
   els.loadNotationBtn.onclick = loadNotation; els.exportBtn.onclick = exportNotation; els.sampleBtn.onclick = sample;
   els.copyBtn.onclick = async () => { exportNotation(); try { await navigator.clipboard.writeText(els.notationBox.value); } catch(e) {} };
   els.themeBtn.onclick = () => { document.body.classList.toggle('dark'); els.themeBtn.textContent = document.body.classList.contains('dark') ? 'Light mode' : 'Dark mode'; };
@@ -548,9 +615,9 @@
     els.inventoryStatus.textContent = inventorySummary() + ' Applied to the board.';
   };
   els.saveSetBtn.onclick = () => { try { applyInventory(parseInventoryText(els.inventoryBox.value), true); els.inventoryStatus.textContent = inventorySummary() + ' Saved in this browser.'; } catch(e) { alert(e.message); } };
-  els.botEnabled.onchange = () => { if (els.botEnabled.checked) setAnalysisOpen(false); pendingSquare = null; render(); };
-  els.botSide.onchange = () => { setAnalysisOpen(false); pendingSquare = null; render(); };
-  els.botDifficulty.onchange = () => { setAnalysisOpen(false); if (isBotTurn()) scheduleBotMove(); };
+  els.botEnabled.onchange = () => { hideAnalysis(); pendingSquare = null; render(); };
+  els.botSide.onchange = () => { hideAnalysis(); pendingSquare = null; render(); };
+  els.botDifficulty.onchange = () => { hideAnalysis(); if (isBotTurn()) scheduleBotMove(); };
   els.diagonalBoard.onchange = () => { els.board.classList.toggle('diagonal', els.diagonalBoard.checked); };
   render();
 })();

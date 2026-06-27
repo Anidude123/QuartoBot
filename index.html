@@ -13,6 +13,24 @@
       <p>Clickable Quarto analyzer with editable piece inventory, custom physical sets, Monte Carlo, tactics, and minimax-lite.</p>
     </div>
     <div class="top-actions">
+      <label class="check-row top-check">
+        <input id="botEnabled" type="checkbox" />
+        <span>Play bot</span>
+      </label>
+      <label>Bot
+        <select id="botSide">
+          <option value="1" selected>P1</option>
+          <option value="0">P0</option>
+        </select>
+      </label>
+      <label>Difficulty
+        <select id="botDifficulty">
+          <option value="easy">Easy</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Hard</option>
+          <option value="expert">Expert</option>
+        </select>
+      </label>
       <button id="themeBtn">Light mode</button>
       <button id="resetBtn">New game</button>
     </div>
@@ -66,12 +84,9 @@
       <div id="pieces" class="pieces"></div>
     </section>
 
-    <section class="panel analysis-panel">
-      <button id="analysisToggle" class="panel-toggle" type="button" aria-expanded="false" aria-controls="analysisContent">
-        <span>Analysis</span>
-        <span class="toggle-icon" aria-hidden="true">+</span>
-      </button>
-      <div id="analysisContent" class="analysis-content" hidden>
+    <section id="analysisPanel" class="panel analysis-panel" hidden>
+      <h2>Analysis</h2>
+      <div id="analysisContent" class="analysis-content">
         <div class="settings">
           <label>Engine
             <select id="engineSelect">
@@ -112,31 +127,6 @@
         <div id="threats" class="threats muted">No threats yet.</div>
       </div>
     </section>
-
-    <section class="panel bot-panel">
-      <h2>Bot</h2>
-      <div class="bot-options">
-        <label class="check-row">
-          <input id="botEnabled" type="checkbox" />
-          <span>Play against bot</span>
-        </label>
-        <label>Bot plays
-          <select id="botSide">
-            <option value="1" selected>Player 1</option>
-            <option value="0">Player 0</option>
-          </select>
-        </label>
-        <label>Difficulty
-          <select id="botDifficulty">
-            <option value="easy">Easy</option>
-            <option value="normal" selected>Normal</option>
-            <option value="hard">Hard</option>
-            <option value="expert">Expert</option>
-          </select>
-        </label>
-      </div>
-    </section>
-
 
     <section class="panel custom-panel">
       <h2>Customize piece set</h2>
