@@ -1,9 +1,11 @@
 :root {
-  --bg: #f4f0e8;
-  --panel: #fffaf1;
+  --bg: #ffffff;
+  --panel: #ffffff;
   --text: #1f2528;
   --muted: #65707a;
-  --border: #d9cdb7;
+  --border: #111111;
+  --slot-bg: #ffffff;
+  --slot-border: #111111;
   --accent: #7b4f2f;
   --accent2: #c99356;
   --danger: #a43d3d;
@@ -11,11 +13,13 @@
   --shadow: 0 12px 30px rgba(20, 20, 20, 0.09);
 }
 body.dark {
-  --bg: #111418;
-  --panel: #191f26;
+  --bg: #000000;
+  --panel: #050505;
   --text: #edf0f2;
   --muted: #a1aab3;
-  --border: #303945;
+  --border: #6b4a2f;
+  --slot-bg: #000000;
+  --slot-border: #7b4f2f;
   --accent: #d79b62;
   --accent2: #8fb7ff;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
@@ -104,9 +108,9 @@ p { margin: 0; }
 }
 .cell {
   aspect-ratio: 1 / 1;
-  border: 2px solid var(--border);
-  border-radius: 16px;
-  background: rgba(127,127,127,0.06);
+  border: 2px solid var(--slot-border);
+  border-radius: 50%;
+  background: var(--slot-bg);
   display: grid;
   place-items: center;
   cursor: pointer;
