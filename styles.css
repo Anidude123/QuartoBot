@@ -38,7 +38,20 @@ body {
   background-size:
     144px 144px,
     144px 144px;
+  animation: driftRings 36s linear infinite;
   color: var(--text);
+}
+@keyframes driftRings {
+  from {
+    background-position:
+      0 0,
+      72px 72px;
+  }
+  to {
+    background-position:
+      144px 144px,
+      216px 216px;
+  }
 }
 .topbar {
   display: flex;
