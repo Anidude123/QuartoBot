@@ -127,15 +127,15 @@ p { margin: 0; }
 .board-shell {
   display: grid;
   place-items: center;
-  min-height: min(76vw, 520px);
-  margin: 18px 0;
+  min-height: min(64vw, 420px);
+  margin: 8px 0 6px;
   overflow: visible;
 }
 .board {
   display: grid;
-  grid-template-columns: repeat(4, minmax(64px, 1fr));
-  gap: 10px;
-  width: min(100%, 390px);
+  grid-template-columns: repeat(4, minmax(54px, 1fr));
+  gap: 8px;
+  width: min(100%, 330px);
   transform-origin: center;
   transition: transform 0.18s ease;
 }
@@ -183,8 +183,8 @@ p { margin: 0; }
   transform: rotate(-45deg) scale(0.64);
 }
 .piece {
-  width: 58px;
-  height: 58px;
+  width: 50px;
+  height: 50px;
   display: grid;
   place-items: center;
   border: 2px solid rgba(0,0,0,0.2);
@@ -249,7 +249,7 @@ p { margin: 0; }
   max-height: 540px;
   overflow: auto;
 }
-.piece-mini { width: 34px; height: 34px; font-size: 8px; }
+.piece-mini { width: 30px; height: 30px; font-size: 8px; }
 .current-piece-card {
   border: 1px dashed var(--border);
   padding: 12px;
@@ -265,8 +265,8 @@ p { margin: 0; }
   gap: 4px;
 }
 .current-piece-preview {
-  width: 70px;
-  min-height: 70px;
+  width: 60px;
+  min-height: 60px;
   display: grid;
   place-items: center;
 }
