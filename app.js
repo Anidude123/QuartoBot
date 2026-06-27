@@ -160,8 +160,8 @@
   function render() {
     syncInventoryBox();
     selectedSuggestion = null; els.applyBestBtn.disabled = true;
-    els.suggestBtn.disabled = botEnabled();
-    els.suggestBtn.title = botEnabled() ? 'Turn off bot play to use analysis suggestions.' : '';
+    els.suggestBtn.disabled = false;
+    els.suggestBtn.title = '';
     els.board.innerHTML = '';
     for (let i=0;i<16;i++) {
       const c = document.createElement('button'); c.className = 'cell'; c.dataset.square = indexToSquare(i);
@@ -205,7 +205,7 @@
   }
   function humanTurnBlocked() { return botThinking || isBotTurn(); }
   function setAnalysisOpen(open) {
-    els.analysisPanel.hidden = !open;
+    els.analysisPanel.hidden = false;
   }
   function clearSuggestionHighlights() {
     els.board.querySelectorAll('.suggested').forEach(el => el.classList.remove('suggested'));
@@ -216,7 +216,6 @@
     selectedSuggestion = null;
     els.applyBestBtn.disabled = true;
     clearSuggestionHighlights();
-    setAnalysisOpen(false);
   }
   function highlightSuggestion({square=null, piece=null}={}) {
     clearSuggestionHighlights();
@@ -406,6 +405,26 @@
       .sort((a,b) => b.score - a.score)
       .slice(0,5);
   }
+  function analyzeStartPieces() {
+    return legalPieces(state)
+      .map(piece => {
+        const draft = {
+          board: state.board.slice(),
+          available: new Set([...state.available]),
+          currentPiece: piece,
+          chooser: 0,
+          placer: 1,
+          winner: null,
+          winLine: null
+        };
+        draft.available.delete(piece);
+        const badSquares = immediateWinningSquares(draft, piece).length;
+        const safeReplies = [...draft.available].filter(p => immediateWinningSquares(draft, p).length === 0).length;
+        return {piece, score: safeReplies * 4 - badSquares * 100};
+      })
+      .sort((a,b) => b.score - a.score)
+      .slice(0,5);
+  }
   function botStartPiece() {
     const pieces = legalPieces();
     if (els.botDifficulty.value === 'easy') return randomChoice(pieces);
@@ -461,16 +480,29 @@
     }, 30);
   }
   function showAnalysis() {
-    if (botEnabled()) {
-      hideAnalysis();
-      return;
-    }
     setAnalysisOpen(true);
     els.suggestBtn.disabled = true;
     els.suggestBtn.textContent = 'Analyzing...';
     els.recommendations.textContent = 'Analyzing without melting the browser...';
     setTimeout(() => {
     try {
+    if (state.currentPiece === null) {
+      const recs = analyzeStartPieces();
+      if (!recs.length) { els.recommendations.textContent = 'No piece recommendation available.'; return; }
+      const best = recs[0];
+      selectedSuggestion = {type:'start', piece:best.piece};
+      els.applyBestBtn.disabled = false;
+      els.evalFill.style.width = '55%';
+      els.evalText.textContent = `Best first piece: give ${codeOf(best.piece)} | eval ${Math.round(best.score)}`;
+      els.recommendations.innerHTML = '';
+      recs.forEach((r, idx) => {
+        const div = document.createElement('div'); div.className = `recommendation ${idx===0?'top':''}`;
+        div.innerHTML = `<strong>#${idx+1}</strong> Give <strong>${codeOf(r.piece)}</strong><br><span class="muted">first piece | score ${Math.round(r.score)}</span>`;
+        els.recommendations.appendChild(div);
+      });
+      highlightSuggestion({piece:best.piece});
+      return;
+    }
     if (pendingSquare !== null) {
       const recs = analyzeGivePieces(pendingSquare);
       if (!recs.length) { els.recommendations.textContent = 'No piece recommendation available.'; return; }
@@ -509,7 +541,7 @@
     } catch (e) {
       els.recommendations.textContent = 'Analysis failed: ' + e.message;
     } finally {
-      els.suggestBtn.disabled = botEnabled();
+      els.suggestBtn.disabled = false;
       els.suggestBtn.textContent = 'Suggest move';
     }
     }, 20);
@@ -584,6 +616,10 @@
   els.suggestBtn.onclick = showAnalysis;
   els.applyBestBtn.onclick = () => {
     if (!selectedSuggestion) return;
+    if (selectedSuggestion.type === 'start') {
+      startGive(selectedSuggestion.piece);
+      return;
+    }
     if (selectedSuggestion.type === 'give') {
       applyMove(selectedSuggestion.square, selectedSuggestion.piece, `place ${indexToSquare(selectedSuggestion.square)} give ${codeOf(selectedSuggestion.piece)}`);
       return;
