@@ -58,6 +58,14 @@
   }
   let state = newState();
   let selectedSuggestion = null;
+  const online = {
+    roomCode: null,
+    role: null,
+    uid: null,
+    roomRef: null,
+    services: null,
+    applyingRemote: false
+  };
 
   const els = {
     board: document.getElementById('board'), pieces: document.getElementById('pieces'),
@@ -73,7 +81,9 @@
     evalFill: document.getElementById('evalFill'), evalText: document.getElementById('evalText'), recommendations: document.getElementById('recommendations'),
     threats: document.getElementById('threats'), notationBox: document.getElementById('notationBox'), loadNotationBtn: document.getElementById('loadNotationBtn'),
     exportBtn: document.getElementById('exportBtn'), copyBtn: document.getElementById('copyBtn'), sampleBtn: document.getElementById('sampleBtn'), history: document.getElementById('history'),
-    themeBtn: document.getElementById('themeBtn'), inventoryBox: document.getElementById('inventoryBox'), inventoryStatus: document.getElementById('inventoryStatus'), officialPresetBtn: document.getElementById('officialPresetBtn'), defectivePresetBtn: document.getElementById('defectivePresetBtn'), saveSetBtn: document.getElementById('saveSetBtn')
+    themeBtn: document.getElementById('themeBtn'), inventoryBox: document.getElementById('inventoryBox'), inventoryStatus: document.getElementById('inventoryStatus'), officialPresetBtn: document.getElementById('officialPresetBtn'), defectivePresetBtn: document.getElementById('defectivePresetBtn'), saveSetBtn: document.getElementById('saveSetBtn'),
+    firebaseStatus: document.getElementById('firebaseStatus'), createRoomBtn: document.getElementById('createRoomBtn'), joinRoomInput: document.getElementById('joinRoomInput'), joinRoomBtn: document.getElementById('joinRoomBtn'),
+    roomCodeLabel: document.getElementById('roomCodeLabel'), copyRoomBtn: document.getElementById('copyRoomBtn'), leaveRoomBtn: document.getElementById('leaveRoomBtn'), playerRoleLabel: document.getElementById('playerRoleLabel'), connectionStatus: document.getElementById('connectionStatus')
   };
 
   function cloneCore(s) {
@@ -83,6 +93,33 @@
     };
   }
   function restoreCore(c) { Object.assign(state, c, {history: state.history, redo: state.redo}); }
+  function serializeGame() {
+    return {
+      board: state.board.map(v => v === undefined ? null : v),
+      available: [...state.available],
+      currentPiece: state.currentPiece,
+      chooser: state.chooser,
+      placer: state.placer,
+      winner: state.winner,
+      winLine: state.winLine || null,
+      history: state.history.map(h => h.notation)
+    };
+  }
+  function deserializeGame(game) {
+    const next = newState();
+    if (!game) return next;
+    next.board = Array.isArray(game.board) ? game.board.slice(0, 16).map(v => v === undefined ? null : v) : Array(16).fill(null);
+    while (next.board.length < 16) next.board.push(null);
+    next.available = new Set(Array.isArray(game.available) ? game.available.map(Number) : []);
+    next.currentPiece = game.currentPiece === undefined ? null : game.currentPiece;
+    next.chooser = Number(game.chooser || 0);
+    next.placer = Number(game.placer === undefined ? 1 : game.placer);
+    next.winner = game.winner === undefined ? null : game.winner;
+    next.winLine = Array.isArray(game.winLine) ? game.winLine.slice() : null;
+    next.history = Array.isArray(game.history) ? game.history.map(notation => ({notation: String(notation), before: cloneCore(newState())})) : [];
+    next.redo = [];
+    return next;
+  }
 
   function pieceNode(p, mini=false) {
     const d = document.createElement('div');
@@ -129,16 +166,19 @@
   function startGive(piece, record=true) {
     if (state.currentPiece !== null || state.history.length) throw new Error('Game already started. Reset or load notation from scratch.');
     if (!state.available.has(piece)) throw new Error('Piece unavailable.');
+    if (onlineActive() && activeActor() !== online.role) throw new Error(`It is ${onlineRoleName(activeActor())}'s turn.`);
     pushUndo(record, `give ${codeOf(piece)}`);
-    state.currentPiece = piece; state.available.delete(piece); state.chooser = 0; state.placer = 1; hideAnalysis(); render();
+    state.currentPiece = piece; state.available.delete(piece); state.chooser = 0; state.placer = 1; hideAnalysis(); render(); publishOnlineState();
   }
   function applyMove(square, givePiece, label=null, record=true) {
+    if (onlineActive() && activeActor() !== online.role) throw new Error(`It is ${onlineRoleName(activeActor())}'s turn.`);
     pushUndo(record, label || `place ${indexToSquare(square)} give ${codeOf(givePiece)}`);
     const next = afterPlaceAndGive(state, square, givePiece);
     Object.assign(state, next);
     pendingSquare = null;
     hideAnalysis();
     render();
+    publishOnlineState();
   }
   function pushUndo(record, notation) {
     if (!record) return;
@@ -189,9 +229,24 @@
       els.statusText.textContent = state.currentPiece === null ? 'Bot will choose the first piece.' : 'Bot will place this piece and choose one for you.';
       els.turnBadge.textContent += ' (bot)';
     }
+    if (onlineMode()) {
+      if (!online.roomCode) {
+        els.statusText.textContent = 'Create or join an online room to start.';
+        els.turnBadge.textContent = 'Online';
+      } else if (state.winner === null) {
+        els.turnBadge.textContent += activeActor() === online.role ? ' (you)' : ' (waiting)';
+        if (activeActor() !== online.role) els.statusText.textContent = `Waiting for ${onlineRoleName(activeActor())}.`;
+      }
+      els.undoBtn.disabled = true;
+      els.redoBtn.disabled = true;
+    } else {
+      els.undoBtn.disabled = false;
+      els.redoBtn.disabled = false;
+    }
     els.history.innerHTML = '';
     state.history.forEach((h, idx) => { const li = document.createElement('li'); li.textContent = h.notation; els.history.appendChild(li); });
     updateThreats();
+    updateOnlinePanel();
     scheduleBotMove();
   }
   let pendingSquare = null;
@@ -199,16 +254,164 @@
   let botTimer = null;
   function botPlayer() { return Number(els.botSide.value); }
   function botEnabled() { return els.playMode.value === 'bot'; }
+  function onlineMode() { return els.playMode.value === 'online'; }
+  function onlineActive() { return onlineMode() && !!online.roomCode && online.role !== null; }
   function syncBotControls() {
     const enabled = botEnabled();
     els.botSide.disabled = !enabled;
     els.botDifficulty.disabled = !enabled;
+    els.createRoomBtn.disabled = !onlineMode();
+    els.joinRoomBtn.disabled = !onlineMode();
+    els.joinRoomInput.disabled = !onlineMode();
   }
   function activeActor(s=state) { return s.currentPiece === null ? s.chooser : s.placer; }
   function isBotTurn(s=state) {
     return botEnabled() && s.winner === null && activeActor(s) === botPlayer();
   }
-  function humanTurnBlocked() { return botThinking || isBotTurn(); }
+  function onlineTurnBlocked() {
+    if (!onlineMode()) return false;
+    if (!online.roomCode || online.role === null) return true;
+    if (state.winner !== null) return true;
+    return activeActor() !== online.role;
+  }
+  function humanTurnBlocked() { return botThinking || isBotTurn() || onlineTurnBlocked(); }
+  function onlineRoleName(role=online.role) { return role === 0 ? 'P1' : role === 1 ? 'P2' : 'Offline'; }
+  function updateOnlinePanel(roomData=null) {
+    const firebaseReady = !!(window.QuartoFirebase && window.QuartoFirebase.isConfigured);
+    els.firebaseStatus.textContent = firebaseReady ? (online.uid ? 'Signed in' : 'Configured') : 'Missing config';
+    els.roomCodeLabel.textContent = online.roomCode || 'None';
+    els.playerRoleLabel.textContent = onlineRoleName();
+    els.copyRoomBtn.disabled = !online.roomCode;
+    els.leaveRoomBtn.disabled = !online.roomCode;
+    if (!onlineMode()) els.connectionStatus.textContent = 'Switch to Play online to use rooms.';
+    else if (!firebaseReady) els.connectionStatus.textContent = 'Paste your Firebase web config into firebase.js.';
+    else if (!online.roomCode) els.connectionStatus.textContent = 'Create a room or join with a 6-character code.';
+    else {
+      const players = roomData && roomData.players ? roomData.players : {};
+      const p1 = players.p1 && players.p1.connected ? 'P1 online' : 'P1 waiting';
+      const p2 = players.p2 && players.p2.connected ? 'P2 online' : 'P2 waiting';
+      const turn = state.winner === null ? `${onlineRoleName(activeActor())} to move` : 'Game over';
+      els.connectionStatus.textContent = `${online.roomCode} connected. You are ${onlineRoleName()}. ${turn}. ${p1}, ${p2}.`;
+    }
+  }
+  function generateRoomCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    return Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  }
+  async function ensureFirebase() {
+    if (!window.QuartoFirebase || !window.QuartoFirebase.isConfigured) throw new Error('Paste your Firebase web config into firebase.js first.');
+    online.services = online.services || window.QuartoFirebase.getServices();
+    if (!online.services.auth.currentUser) await online.services.auth.signInAnonymously();
+    online.uid = online.services.auth.currentUser.uid;
+    updateOnlinePanel();
+    return online.services;
+  }
+  function roomPayload() {
+    return {
+      inventoryCodes: INVENTORY_CODES.slice(),
+      game: serializeGame(),
+      updatedAt: window.firebase ? window.firebase.database.ServerValue.TIMESTAMP : Date.now()
+    };
+  }
+  function applyRemoteRoom(roomData) {
+    if (!roomData) return;
+    online.applyingRemote = true;
+    try {
+      if (Array.isArray(roomData.inventoryCodes) && roomData.inventoryCodes.length === 16) {
+        INVENTORY_CODES = roomData.inventoryCodes.map(c => String(c).toUpperCase());
+        refreshAttrBits();
+      }
+      state = deserializeGame(roomData.game);
+      pendingSquare = null;
+      inventoryBoxDirty = false;
+      render();
+      updateOnlinePanel(roomData);
+    } finally {
+      online.applyingRemote = false;
+    }
+  }
+  function detachRoom() {
+    if (online.roomRef) online.roomRef.off();
+    online.roomRef = null;
+    online.roomCode = null;
+    online.role = null;
+    updateOnlinePanel();
+  }
+  async function leaveRoom() {
+    if (online.roomRef && online.role !== null) {
+      const slot = online.role === 0 ? 'p1' : 'p2';
+      try { await online.roomRef.child(`players/${slot}/connected`).set(false); } catch(e) {}
+    }
+    detachRoom();
+    render();
+  }
+  async function attachRoom(code, role) {
+    const services = await ensureFirebase();
+    if (online.roomRef) online.roomRef.off();
+    online.roomCode = code;
+    online.role = role;
+    online.roomRef = services.db.ref(`rooms/${code}`);
+    const slot = role === 0 ? 'p1' : 'p2';
+    await online.roomRef.child(`players/${slot}`).update({uid: online.uid, connected: true});
+    online.roomRef.child(`players/${slot}/connected`).onDisconnect().set(false);
+    online.roomRef.on('value', snap => applyRemoteRoom(snap.val()));
+    updateOnlinePanel();
+  }
+  async function createRoom() {
+    try {
+      els.playMode.value = 'online';
+      syncBotControls();
+      const services = await ensureFirebase();
+      state = newState();
+      pendingSquare = null;
+      for (let attempts = 0; attempts < 8; attempts++) {
+        const code = generateRoomCode();
+        const roomRef = services.db.ref(`rooms/${code}`);
+        const snap = await roomRef.once('value');
+        if (snap.exists()) continue;
+        await roomRef.set({
+          ...roomPayload(),
+          createdAt: window.firebase.database.ServerValue.TIMESTAMP,
+          players: {p1: {uid: online.uid, connected: true}, p2: {uid: null, connected: false}}
+        });
+        await attachRoom(code, 0);
+        render();
+        return;
+      }
+      throw new Error('Could not find an unused room code. Try again.');
+    } catch (e) {
+      alert(e.message);
+      updateOnlinePanel();
+    }
+  }
+  async function joinRoom() {
+    try {
+      els.playMode.value = 'online';
+      syncBotControls();
+      const services = await ensureFirebase();
+      const code = els.joinRoomInput.value.trim().toUpperCase();
+      if (!/^[A-Z0-9]{6}$/.test(code)) throw new Error('Enter a 6-character room code.');
+      const roomRef = services.db.ref(`rooms/${code}`);
+      const snap = await roomRef.once('value');
+      if (!snap.exists()) throw new Error('Room not found.');
+      const data = snap.val();
+      const players = data.players || {};
+      let role = null;
+      if (players.p1 && players.p1.uid === online.uid) role = 0;
+      else if (players.p2 && players.p2.uid === online.uid) role = 1;
+      else if (!players.p1 || !players.p1.uid) role = 0;
+      else if (!players.p2 || !players.p2.uid) role = 1;
+      else throw new Error('Room is full.');
+      await attachRoom(code, role);
+    } catch (e) {
+      alert(e.message);
+      updateOnlinePanel();
+    }
+  }
+  function publishOnlineState() {
+    if (!onlineActive() || online.applyingRemote || !online.roomRef) return;
+    online.roomRef.update(roomPayload());
+  }
   function setAnalysisOpen(open) {
     els.analysisPanel.hidden = false;
   }
@@ -255,6 +458,7 @@
     }
   }
   function onCell(i) {
+    if (onlineTurnBlocked()) { alert(online.roomCode ? `It is ${onlineRoleName(activeActor())}'s turn.` : 'Create or join an online room first.'); return; }
     if (humanTurnBlocked()) return;
     if (state.winner !== null || state.currentPiece === null || state.board[i] !== null) return;
     pendingSquare = i;
@@ -264,6 +468,7 @@
   }
   function onPiece(p) {
     try {
+      if (onlineTurnBlocked()) { alert(online.roomCode ? `It is ${onlineRoleName(activeActor())}'s turn.` : 'Create or join an online room first.'); return; }
       if (humanTurnBlocked()) return;
       if (state.currentPiece === null && state.history.length === 0) startGive(p);
       else if (pendingSquare !== null) { applyMove(pendingSquare, p); pendingSquare = null; }
@@ -626,6 +831,7 @@
     els.inventoryStatus.textContent = inventorySummary();
   }
   function applyInventory(codes, save=false) {
+    if (onlineActive() && !online.applyingRemote && online.role !== 0) throw new Error('Only P1 can change the online room inventory.');
     INVENTORY_CODES = codes.slice();
     refreshAttrBits();
     if (save) localStorage.setItem('quartoInventoryCodes', JSON.stringify(INVENTORY_CODES));
@@ -635,12 +841,14 @@
     hideAnalysis();
     inventoryBoxDirty = false;
     render();
+    publishOnlineState();
   }
 
 
   els.suggestBtn.onclick = showAnalysis;
   els.applyBestBtn.onclick = () => {
     if (!selectedSuggestion) return;
+    if (onlineTurnBlocked()) { alert(online.roomCode ? `It is ${onlineRoleName(activeActor())}'s turn.` : 'Create or join an online room first.'); return; }
     if (selectedSuggestion.type === 'start') {
       startGive(selectedSuggestion.piece);
       return;
@@ -654,8 +862,15 @@
     else applyMove(m.square, m.give, `place ${indexToSquare(m.square)} give ${codeOf(m.give)}`);
   };
   els.undoBtn.onclick = undo; els.redoBtn.onclick = redo;
-  els.resetBtn.onclick = () => { state = newState(); pendingSquare = null; els.notationBox.value=''; els.recommendations.textContent='Click Suggest move.'; els.evalText.textContent='No analysis yet.'; els.evalFill.parentElement.classList.remove('loading'); setAnalysisProgress(0); hideAnalysis(); render(); };
-  els.loadNotationBtn.onclick = loadNotation; els.exportBtn.onclick = exportNotation; els.sampleBtn.onclick = sample;
+  els.resetBtn.onclick = () => {
+    if (onlineActive() && online.role !== 0) { alert('Only P1 can reset an online room.'); return; }
+    state = newState(); pendingSquare = null; els.notationBox.value=''; els.recommendations.textContent='Click Suggest move.'; els.evalText.textContent='No analysis yet.'; els.evalFill.parentElement.classList.remove('loading'); setAnalysisProgress(0); hideAnalysis(); render(); publishOnlineState();
+  };
+  els.loadNotationBtn.onclick = () => {
+    if (onlineActive() && online.role !== 0) { alert('Only P1 can load notation into an online room.'); return; }
+    loadNotation(); publishOnlineState();
+  };
+  els.exportBtn.onclick = exportNotation; els.sampleBtn.onclick = sample;
   els.copyBtn.onclick = async () => { exportNotation(); try { await navigator.clipboard.writeText(els.notationBox.value); } catch(e) {} };
   function setTheme(useDark) {
     document.body.classList.toggle('dark', useDark);
@@ -696,6 +911,12 @@
   els.botSide.onchange = () => { hideAnalysis(); pendingSquare = null; render(); };
   els.botDifficulty.onchange = () => { hideAnalysis(); if (isBotTurn()) scheduleBotMove(); };
   els.diagonalBoard.onchange = () => { els.board.classList.toggle('diagonal', els.diagonalBoard.checked); };
+  els.createRoomBtn.onclick = createRoom;
+  els.joinRoomBtn.onclick = joinRoom;
+  els.copyRoomBtn.onclick = async () => { if (online.roomCode) await navigator.clipboard.writeText(online.roomCode); };
+  els.leaveRoomBtn.onclick = leaveRoom;
+  els.joinRoomInput.oninput = () => { els.joinRoomInput.value = els.joinRoomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6); };
+  updateOnlinePanel();
   syncBotControls();
   render();
 })();

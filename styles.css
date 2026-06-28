@@ -108,7 +108,8 @@ p { margin: 0; }
 .board-panel { grid-row: span 2; }
 .pieces-panel { grid-column: 2; grid-row: 1; }
 .analysis-panel { grid-column: 3; grid-row: 1; }
-.custom-panel { grid-column: 2 / span 2; grid-row: 2; }
+.online-panel { grid-column: 2; grid-row: 2; }
+.custom-panel { grid-column: 3; grid-row: 2; }
 .notation-panel { grid-column: 1 / span 2; grid-row: 3; align-self: stretch; }
 .game-description-panel { grid-column: 3; grid-row: 3; align-self: start; }
 .status-row, .top-actions, .bot-top-group { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -305,7 +306,7 @@ p { margin: 0; }
   height: 18px;
   accent-color: var(--accent);
 }
-button, select {
+button, select, input {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 10px 12px;
@@ -325,7 +326,8 @@ select option {
 }
 body.dark select,
 body.dark select option,
-body.dark .topbar select {
+body.dark .topbar select,
+body.dark input {
   background: #000000 !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff;
@@ -377,6 +379,29 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   line-height: 1.45;
   margin-top: 12px;
   padding-top: 10px;
+}
+.online-stack {
+  display: grid;
+  gap: 10px;
+}
+.online-status-row,
+.online-room-card {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+}
+.join-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+.join-row input {
+  min-width: 0;
+  text-transform: uppercase;
 }
 .game-description-box {
   border: 1px solid var(--border);
@@ -445,7 +470,8 @@ code { background: rgba(127,127,127,0.13); padding: 2px 5px; border-radius: 6px;
 @media (max-width: 1100px) {
   .layout { grid-template-columns: 1fr; }
   .pieces-panel,
-  .analysis-panel {
+  .analysis-panel,
+  .online-panel {
     grid-column: auto;
     grid-row: auto;
   }
