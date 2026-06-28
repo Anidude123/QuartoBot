@@ -369,6 +369,12 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   line-height: 1.5;
 }
 .game-description-box p + p { margin-top: 10px; }
+.developer-credit {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 10px;
+  text-align: center;
+}
 .settings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
 label { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
 .eval-card { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 16px; }
