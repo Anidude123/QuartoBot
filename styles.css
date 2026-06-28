@@ -375,6 +375,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   margin-top: 10px;
   text-align: center;
 }
+.developer-credit p + p { margin-top: 4px; }
 .settings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
 label { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
 .eval-card { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 16px; }
