@@ -336,13 +336,31 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .board-view-toggle { margin-top: 10px; }
 .analysis-content { margin-top: 4px; }
 .rules-card {
-  border-top: 1px solid var(--border);
-  margin-top: 16px;
-  padding-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 12px;
+  padding: 0;
+  overflow: hidden;
 }
-.rules-card h2 {
+.rules-card summary {
+  cursor: pointer;
   font-size: 18px;
-  margin-bottom: 8px;
+  font-weight: 700;
+  list-style: none;
+  padding: 12px 14px;
+}
+.rules-card summary::-webkit-details-marker { display: none; }
+.rules-card summary::after {
+  content: "v";
+  float: right;
+  color: var(--accent);
+}
+.rules-card[open] summary::after {
+  content: "^";
+}
+.rules-content {
+  border-top: 1px solid var(--border);
+  padding: 12px 14px;
 }
 .rules-card ul {
   margin: 0;

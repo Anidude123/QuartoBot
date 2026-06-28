@@ -50,6 +50,20 @@
         <div class="turn-badge" id="turnBadge">P1 chooses</div>
       </div>
 
+      <details class="rules-card">
+        <summary id="rulesHeading">Rules</summary>
+        <div class="rules-content" aria-labelledby="rulesHeading">
+          <ul>
+            <li>On your turn, place the piece your opponent gave you.</li>
+            <li>After placing, choose one remaining piece for your opponent to place next.</li>
+            <li>Win by completing a row, column, or diagonal of four pieces that share one attribute.</li>
+            <li>Shared attributes are tall/short, light/dark, round/square, and solid/hole.</li>
+            <li>If all 16 pieces are placed with no shared-attribute line, the game is a draw.</li>
+          </ul>
+          <p class="piece-code-reference">Piece code: T/S = Tall/Short, L/D = Light/Dark, R/Q = Round/Square, F/H = Solid/Hole. Duplicate physical pieces are supported with #slot labels. Squares: A1-D4.</p>
+        </div>
+      </details>
+
       <div class="board-shell">
         <div id="board" class="board" aria-label="Quarto board"></div>
       </div>
@@ -72,18 +86,6 @@
         <input id="diagonalBoard" type="checkbox" />
         <span>Diagonal board</span>
       </label>
-
-      <section class="rules-card" aria-labelledby="rulesHeading">
-        <h2 id="rulesHeading">Rules</h2>
-        <ul>
-          <li>On your turn, place the piece your opponent gave you.</li>
-          <li>After placing, choose one remaining piece for your opponent to place next.</li>
-          <li>Win by completing a row, column, or diagonal of four pieces that share one attribute.</li>
-          <li>Shared attributes are tall/short, light/dark, round/square, and solid/hole.</li>
-          <li>If all 16 pieces are placed with no shared-attribute line, the game is a draw.</li>
-        </ul>
-        <p class="piece-code-reference">Piece code: T/S = Tall/Short, L/D = Light/Dark, R/Q = Round/Square, F/H = Solid/Hole. Duplicate physical pieces are supported with #slot labels. Squares: A1-D4.</p>
-      </section>
     </section>
 
     <section class="panel pieces-panel">
