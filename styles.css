@@ -25,6 +25,20 @@ body.dark {
   --accent2: #8fb7ff;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
 }
+@media (prefers-color-scheme: dark) {
+  body:not(.light) {
+    --bg: #171717;
+    --panel: #171717;
+    --text: #edf0f2;
+    --muted: #a1aab3;
+    --border: #9a6b1f;
+    --bg-ring: #9a6b1f;
+    --top-border: #b07a24;
+    --accent: #d79b62;
+    --accent2: #8fb7ff;
+    --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  }
+}
 * { box-sizing: border-box; }
 body {
   margin: 0;
