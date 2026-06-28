@@ -302,7 +302,11 @@ button, select {
 }
 .topbar button,
 .topbar select {
-  background: transparent;
+  background: var(--panel);
+  color: var(--text);
+}
+select option {
+  background: var(--panel);
   color: var(--text);
 }
 button:hover { border-color: var(--accent); }
