@@ -657,7 +657,16 @@
   els.resetBtn.onclick = () => { state = newState(); pendingSquare = null; els.notationBox.value=''; els.recommendations.textContent='Click Suggest move.'; els.evalText.textContent='No analysis yet.'; els.evalFill.parentElement.classList.remove('loading'); setAnalysisProgress(0); hideAnalysis(); render(); };
   els.loadNotationBtn.onclick = loadNotation; els.exportBtn.onclick = exportNotation; els.sampleBtn.onclick = sample;
   els.copyBtn.onclick = async () => { exportNotation(); try { await navigator.clipboard.writeText(els.notationBox.value); } catch(e) {} };
-  els.themeBtn.onclick = () => { document.body.classList.toggle('dark'); els.themeBtn.textContent = document.body.classList.contains('dark') ? 'Light mode' : 'Dark mode'; };
+  function syncThemeButton() {
+    els.themeBtn.textContent = document.body.classList.contains('dark') ? 'Light mode' : 'Dark mode';
+  }
+  function applySystemTheme() {
+    const useDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.body.classList.toggle('dark', useDark);
+    syncThemeButton();
+  }
+  applySystemTheme();
+  els.themeBtn.onclick = () => { document.body.classList.toggle('dark'); syncThemeButton(); };
   els.inventoryBox.oninput = () => {
     inventoryBoxDirty = true;
     try {
