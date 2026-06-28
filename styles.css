@@ -305,9 +305,12 @@ button, select {
   background: var(--panel);
   color: var(--text);
 }
+.topbar select {
+  color: #111111;
+}
 select option {
   background: var(--panel);
-  color: var(--text);
+  color: #111111;
 }
 button:hover { border-color: var(--accent); }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
