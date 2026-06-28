@@ -1,0 +1,9 @@
+.git
+.github
+.codex
+.agents
+__pycache__
+*.pyc
+streamlit_app.py
+requirements.txt
+README.txt
