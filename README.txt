@@ -49,7 +49,49 @@ Running locally:
 2. Open http://localhost:8000 in a browser.
 3. For online play, switch Mode to Play online, create a room, and share the room code.
 
-Deploying to Firebase Hosting:
+Deploying to GitHub Pages:
+This app is a static site. GitHub Pages serves index.html, styles.css,
+app.js, and firebase.js directly; no Python server, Streamlit, npm install,
+or build step is needed. Asset paths are relative, so both a root site and
+a project site (under /QuartoBot/) work.
+
+To use exactly https://quartobot.github.io/:
+1. You must own a GitHub user or organization account named quartobot.
+   GitHub assigns github.io subdomains by account name, not the app name.
+   Renaming Anidude123/QuartoBot alone cannot claim that address.
+2. Under that account, create a public repository named quartobot.github.io
+   and copy this project, including .github/workflows/pages.yml and
+   .nojekyll, into its main branch. Alternatively, transfer and rename the
+   existing repository if you want to move its history and issues too.
+3. In the destination repository, open Settings > Pages and set
+   Build and deployment > Source to GitHub Actions.
+4. Push the files to main. The Deploy to GitHub Pages workflow publishes
+   the site. For an existing push, open Actions > Deploy to GitHub Pages >
+   Run workflow and select main.
+5. Once the workflow succeeds, open https://quartobot.github.io/.
+
+To keep the current Anidude123/QuartoBot repository:
+Follow steps 3 and 4 there. Its normal Pages address is
+https://anidude123.github.io/QuartoBot/.
+
+The workflow deploys only the five static site files listed in its
+Prepare static site step. If you add images or other local assets later,
+include them in that step. If your deployment branch is not main, update
+the workflow's push.branches setting accordingly. Do not add a CNAME
+file for a github.io address; CNAME is for a custom domain you own.
+
+Online multiplayer on GitHub Pages:
+- Local and bot games work without Firebase configuration.
+- Online rooms still require the Firebase setup described above. Pages
+  hosts the frontend; Firebase continues to provide authentication and
+  the Realtime Database.
+- In Firebase Authentication > Settings > Authorized domains, add your
+  deployed hostname (quartobot.github.io or anidude123.github.io), without
+  https:// or a path.
+- Configure your Firebase Realtime Database security rules for your app;
+  publishing the frontend does not configure database access.
+
+Deploying to Firebase Hosting (alternative):
 1. Install the Firebase CLI if needed:
    npm install -g firebase-tools
 2. Sign in:
